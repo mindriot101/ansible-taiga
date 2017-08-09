@@ -1,0 +1,218 @@
+---
+- hosts: all
+  vars:
+    - username: taiga
+    - pg_db: taiga
+    - pg_user: taiga
+    - rabbitmq_username: taiga
+    - rabbitmq_vhost_name: taiga
+    - log_dir: /home/{{ username }}/logs
+    - hostname: vagranthost
+    - rabbitmq_password: rabbitmq-password-taiga
+
+  handlers:
+    - name: restart circus
+      service:
+        name: circusd
+        state: restarted
+      become: yes
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes
+
+  tasks:
+    # - name: Create the taiga user
+    #   user:
+    #     name: "{{ username }}"
+    #     groups: sudo
+    #   become: yes
+
+    # - name: Fetch the required packages
+    #   apt:
+    #     name: "{{ item }}"
+    #     update_cache: yes
+    #     cache_valid_time: 86400
+    #   with_items:
+    #     - build-essential
+    #     - binutils-doc
+    #     - autoconf
+    #     - flex
+    #     - bison
+    #     - libjpeg-dev
+    #     - libfreetype6-dev
+    #     - zlib1g-dev
+    #     - libzmq3-dev
+    #     - libgdbm-dev
+    #     - libncurses5-dev
+    #     - automake
+    #     - libtool
+    #     - libffi-dev
+    #     - curl
+    #     - git
+    #     - tmux
+    #     - gettext
+    #     - nginx
+    #     - rabbitmq-server
+    #     - redis-server
+    #     - circus
+    #     - postgresql-9.5
+    #     - postgresql-contrib-9.5
+    #     - postgresql-doc-9.5
+    #     - postgresql-server-dev-9.5
+    #     - python3
+    #     - python3-pip
+    #     - python-dev
+    #     - python3-dev
+    #     - python-pip
+    #     - virtualenvwrapper
+    #     - libxml2-dev
+    #     - libxslt-dev
+    #     - python-psycopg2
+    #   become: yes
+
+    # - name: Create the postgresql database
+    #   postgresql_db:
+    #     name: "{{ pg_db }}"
+    #   become_user: postgres
+    #   become: yes
+
+    # - name: Create the postgresql user
+    #   postgresql_user:
+    #     db: "{{ pg_db }}"
+    #     name: "{{ pg_user }}"
+    #   become_user: postgres
+    #   become: yes
+
+    # - name: Add the rabbitmq vhost
+    #   rabbitmq_vhost:
+    #     name: "{{ rabbitmq_vhost_name }}"
+    #   become: yes
+
+    # - name: Create the rabbitmq user
+    #   rabbitmq_user:
+    #     user: "{{ rabbitmq_username }}"
+    #     permissions:
+    #       - vhost: "{{ rabbitmq_vhost_name }}"
+    #         configure_priv: .*
+    #         read_priv: .*
+    #         write_priv: .*
+    #     password: "{{ rabbitmq_password }}"
+    #     force: yes
+    #   become: yes
+
+    # - name: Create the logs dir
+    #   file:
+    #     name: "{{ log_dir }}"
+    #     state: directory
+    #     owner: "{{ username }}"
+    #     group: "{{ username }}"
+    #     mode: 0755
+    #   become: yes
+
+    # - name: Clone the taiga-back source
+    #   git:
+    #     repo: https://github.com/taigaio/taiga-back.git
+    #     dest: /home/{{ username }}/taiga-back
+    #     version: stable
+    #   become_user: "{{ username }}"
+    #   become: yes
+
+    # - name: Install the python packages
+    #   pip:
+    #     requirements: /home/{{ username }}/taiga-back/requirements.txt
+    #     virtualenv: /home/{{ username }}/taiga-env
+    #     virtualenv_python: python3.5
+    #   become_user: "{{ username }}"
+    #   become: yes
+
+    # - name: Populate the database with initial basic data
+    #   command: /home/{{ username }}/taiga-env/bin/python manage.py migrate --noinput
+    #   args:
+    #     chdir: /home/{{ username }}/taiga-back
+    #   become_user: taiga
+    #   become: yes
+
+    # - name: Load the initial user data
+    #   command: /home/{{ username }}/taiga-env/bin/python manage.py loaddata initial_user
+    #   args:
+    #     chdir: /home/{{ username }}/taiga-back
+    #   become_user: taiga
+    #   become: yes
+
+    # - name: Load the initial project templates
+    #   command: /home/{{ username }}/taiga-env/bin/python manage.py loaddata initial_project_templates
+    #   args:
+    #     chdir: /home/{{ username }}/taiga-back
+    #   become_user: taiga
+    #   become: yes
+
+    # - name: Compile messages
+    #   command: /home/{{ username }}/taiga-env/bin/python manage.py compilemessages
+    #   args:
+    #     chdir: /home/{{ username }}/taiga-back
+    #   become_user: taiga
+    #   become: yes
+
+    # - name: Collect static files
+    #   command: /home/{{ username }}/taiga-env/bin/python manage.py collectstatic --noinput
+    #   args:
+    #     chdir: /home/{{ username }}/taiga-back
+    #   become_user: taiga
+    #   become: yes
+
+    # - name: Import sample data
+    #   command: /home/{{ username }}/taiga-env/bin/python manage.py sample_data
+    #   args:
+    #     chdir: /home/{{ username }}/taiga-back
+    #   become_user: taiga
+    #   become: yes
+
+#     - name: Copy the template
+#       template:
+#         src: local_settings.py.j2
+#         dest: /home/{{ username }}/taiga-back/settings/local.py
+#         owner: "{{ username }}"
+#         group: "{{ username }}"
+#       become_user: taiga
+#       become: yes
+
+    # - name: Clone the taiga-front source
+    #   git:
+    #     repo: https://github.com/taigaio/taiga-front-dist.git
+    #     dest: /home/{{ username }}/taiga-front-dist
+    #     version: stable
+    #   become_user: "{{ username }}"
+    #   become: yes
+
+    # - name: Copy the config file
+    #   template:
+    #     src: front_conf.json.j2
+    #     dest: /home/{{ username }}/taiga-front-dist/dist/conf.json
+    #     owner: "{{ username }}"
+    #     group: "{{ username }}"
+    #   become_user: "{{ username }}"
+    #   become: yes
+
+    # - name: Copy the circus config file
+    #   template:
+    #     src: taiga.ini.j2
+    #     dest: /etc/circus/conf.d/taiga.ini
+    #   become: yes
+    #   notify: restart circus
+
+    - name: Remove default nginx config file
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      become: yes
+
+    - name: Add nginx config file
+      template:
+        src: taiga_nginx.conf.j2
+        dest: /etc/nginx/conf.d/taiga.conf
+      become: yes
+      notify: restart nginx
